@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>replit</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    type="text/css" />
+</head>
+
+<body>
+  <div class="container">
+    <h1>Book Database</h1>
+    <h2>Get Request</h2>
+    <button id="getRequest" class="btn btn-primary">Get Data</button><br><br>
+    <div id="listGetRequest" class="list-group"></div>
+    <div id="getRequestContainer"></div>
+
+    <h2>POST Request</h2>
+    <form id="requestForm">
+      <label for="bookName">Book Name:</label><br>
+      <input id="bookName" class="form-control" /><br>
+      <label for="author">Author:</label><br>
+      <input id="author" class="form-control"></input><br>
+      <button class="btn btn-success">Submit</button><br><br>
+    </form>
+    <div id="responseContainer"></div>
+  </div>
+
+  <script>
+    const requestForm = document.querySelector("#requestForm")
+    const bookName = document.querySelector("#bookName")
+    const author = document.querySelector("#author")
+    const responseContainer = document.querySelector("#responseContainer")
+    const getRequest = document.querySelector("#getRequest")
+    const listGetRequest = document.querySelector("#listGetRequest")
+    const getRequestContainer = document.querySelector("#getRequestContainer")
+    const apiUrl = 'https://post-books-student-neog.replit.app/books'
+
+    getRequest.addEventListener("click", function () {
+      listGetRequest.innerHTML = ''
+      fetch(apiUrl).then(function (response) {
+        return response.json()
+      }).then(function (data) {
+        if (data) {
+          for (let i = 0; i < data.length; i++) {
+            const listElements = document.createElement('div')
+            listElements.innerHTML = `<div class="list-group-item list-group-item-action" >
+                <div class="d-flex w-100 justify-content-between">
+                  <p><strong>Book ID: ${data[i]._id}</strong></p>
+                </div>
+                <p class="mb-1">${JSON.stringify(data[i])}</p>
+               </div><br>`
+
+
+            listGetRequest.appendChild(listElements)
+          }
+        } else {
+          getRequestContainer.textContent = "Failed to fetch GET request."
+        }
+      }).catch(function (error) {
+        getRequestContainer.textContent = "An error occured while getting the request."
+      })
+    })
+
+    requestForm.addEventListener("submit", function (event) {
+      event.preventDefault()
+      const PostRequestData = {
+        bookName: bookName.value,
+        author: author.value
+      }
+
+      fetch(apiUrl, {
+        method: "POST",
+        body: JSON.stringify(PostRequestData),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(function (response) {
+        return response.json()
+      }).then(function (data) {
+        if (data) {
+          responseContainer.textContent = JSON.stringify(data)
+        } else {
+          responseContainer.textContent = 'Failed to make the POST Request.'
+        }
+      }).catch(function (error) {
+        responseContainer.textContent = 'An error occured while making the POST Request.'
+      })
+    })
+  </script>
+</body>
+
+</html>
